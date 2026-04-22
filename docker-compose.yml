@@ -1,0 +1,19 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: oidc_mongodb
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    environment:
+
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_DATABASE: oidc_db
+    volumes:
+      - mongodb_data:/data/db
+    command: ["--auth"] 
+
+volumes:
+  mongodb_data:
+    name: oidc_mongodb_data
