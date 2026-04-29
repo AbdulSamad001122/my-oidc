@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error — MyOIDC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0a0f0a',
+            surface: '#111a11',
+            border: '#1f2f1f',
+            green: '#22c55e',
+            'green-dim': '#16a34a',
+            text: '#e8f5e9',
+            'text-muted': '#6b8f6b',
+            error: '#f87171'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-bg text-text font-sans flex justify-center items-center min-h-screen antialiased">
+  <div class="bg-surface border border-border rounded-[18px] py-10 px-8 w-full max-w-[400px] text-center">
+    <div class="w-12 h-12 bg-[#2d0d0d] border border-[#991b1b] text-error rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">!</div>
+    <h1 class="text-xl font-bold text-text mb-3">Authorization Error</h1>
+    <p id="errorMsg" class="text-[0.925rem] text-text-muted mb-8">An unknown error occurred.</p>
+    <a href="/" class="inline-block w-full py-3 bg-green text-[#0a0f0a] rounded-lg text-[0.925rem] font-bold transition-all hover:bg-green-dim">Return to Home</a>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const msg = urlParams.get('msg');
+    if (msg) {
+      document.getElementById('errorMsg').textContent = msg;
+    }
+  </script>
+</body>
+</html>

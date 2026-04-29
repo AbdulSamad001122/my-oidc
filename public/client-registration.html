@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register App — MyOIDC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0a0f0a',
+            surface: '#111a11',
+            'surface-hover': '#162016',
+            border: '#1f2f1f',
+            green: '#22c55e',
+            'green-dim': '#16a34a',
+            text: '#e8f5e9',
+            'text-muted': '#6b8f6b',
+            error: '#f87171'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['SFMono-Regular', 'Consolas', 'monospace']
+          },
+          animation: {
+            toastIn: 'toastIn 0.25s ease',
+            spin: 'spin 0.7s linear infinite',
+          },
+          keyframes: {
+            toastIn: {
+              '0%': { opacity: 0, transform: 'translateX(20px)' },
+              '100%': { opacity: 1, transform: 'translateX(0)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-bg text-text font-sans flex justify-center items-start min-h-screen py-12 px-4 antialiased">
+  <div id="toast-container" class="fixed top-5 right-5 flex flex-col gap-2.5 z-[9999]"></div>
+  
+  <div class="w-full max-w-[480px]">
+    <div class="flex items-center justify-between mb-8">
+      <div class="flex items-center gap-3">
+        <div class="w-[38px] h-[38px] bg-green rounded-[9px] flex items-center justify-center text-[1.1rem]">🔐</div>
+        <span class="font-bold text-[1.1rem]">MyOIDC Developer</span>
+      </div>
+      <div class="flex gap-3">
+        <a href="/admin.html" class="text-[0.8rem] text-text-muted hover:text-green transition-colors font-semibold">Dashboard</a>
+        <button onclick="logout()" class="text-[0.8rem] text-text-muted hover:text-error transition-colors font-semibold">Logout</button>
+      </div>
+    </div>
+    
+    <div class="bg-surface border border-border rounded-[18px] p-8 mb-6" id="formCard">
+      <h1 class="text-[1.2rem] font-bold mb-1">Register an Application</h1>
+      <p class="text-[0.85rem] text-text-muted mb-7">Create OAuth2 credentials to integrate your app with MyOIDC.</p>
+      <form id="clientForm">
+        <div class="mb-4.5">
+          <label for="name" class="block text-[0.78rem] font-semibold text-text-muted uppercase tracking-wider mb-1.5">Application Name</label>
+          <input type="text" id="name" placeholder="My Awesome App" required class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors duration-150 focus:outline-none focus:border-green placeholder:text-text-muted">
+        </div>
+        <div class="mb-4.5 mt-4">
+          <label for="redirectUris" class="block text-[0.78rem] font-semibold text-text-muted uppercase tracking-wider mb-1.5">Redirect URI(s)</label>
+          <input type="text" id="redirectUris" placeholder="http://localhost:3000/callback" required class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors duration-150 focus:outline-none focus:border-green placeholder:text-text-muted">
+          <div class="text-[0.78rem] text-text-muted mt-1.5">Separate multiple URIs with commas.</div>
+        </div>
+        <button type="submit" class="w-full py-3 bg-green text-[#0a0f0a] border-none rounded-lg text-[0.925rem] font-bold cursor-pointer transition-all duration-150 hover:bg-green-dim active:scale-98 disabled:opacity-55 disabled:cursor-not-allowed mt-6 flex items-center justify-center gap-2" id="createBtn">Create Application</button>
+      </form>
+    </div>
+    
+    <div class="bg-surface border border-border rounded-[18px] p-8 hidden" id="resultCard">
+      <div class="inline-flex items-center gap-1.5 bg-[#0d2d0d] border border-[#166534] text-[#86efac] text-[0.8rem] font-semibold py-1 px-3 rounded-full mb-6">✓ Application Registered</div>
+      <h1 id="appNameTitle" class="text-[1.2rem] font-bold mb-1"></h1>
+      <p class="text-[0.85rem] text-text-muted mb-6">Save your credentials — the secret will not be shown again.</p>
+
+      <div class="mb-5">
+        <div class="text-[0.78rem] font-semibold text-text-muted uppercase tracking-wider mb-1.5">Client ID</div>
+        <div class="bg-bg border border-border rounded-lg py-3 px-4 flex items-center gap-3">
+          <span class="font-mono text-[0.82rem] text-green flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" id="showClientId"></span>
+          <button class="bg-surface-hover border border-border text-text-muted text-[0.78rem] font-semibold cursor-pointer rounded-md py-1 px-2.5 shrink-0 transition-colors duration-150 hover:text-green hover:border-green" id="copyId">Copy</button>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <div class="text-[0.78rem] font-semibold text-text-muted uppercase tracking-wider mb-1.5">Client Secret</div>
+        <div class="bg-bg border border-border rounded-lg py-3 px-4 flex items-center gap-3">
+          <span class="font-mono text-[0.82rem] text-green flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" id="showClientSecret"></span>
+          <button class="bg-surface-hover border border-border text-text-muted text-[0.78rem] font-semibold cursor-pointer rounded-md py-1 px-2.5 shrink-0 transition-colors duration-150 hover:text-green hover:border-green" id="copySecret">Copy</button>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <div class="text-[0.78rem] font-semibold text-text-muted uppercase tracking-wider mb-1.5">Authorization URL</div>
+        <div class="bg-bg border border-border rounded-xl overflow-hidden">
+          <div class="flex p-1 gap-1 bg-surface border-b border-border">
+            <button class="flex-1 py-2 px-2 border-none bg-green text-[#0a0f0a] text-[0.78rem] font-semibold cursor-pointer rounded-md transition-all duration-150" id="btn-full" onclick="switchUrl('full')">Full URL</button>
+            <button class="flex-1 py-2 px-2 border-none bg-transparent text-text-muted text-[0.78rem] font-semibold cursor-pointer rounded-md transition-all duration-150" id="btn-tmpl" onclick="switchUrl('tmpl')">Template URL</button>
+          </div>
+
+          <!-- Full URL panel -->
+          <div class="block" id="panel-full">
+            <div class="font-mono text-[0.78rem] leading-[1.8] break-all p-4 text-text-muted" id="code-full"></div>
+          </div>
+
+          <!-- Template URL panel -->
+          <div class="hidden" id="panel-tmpl">
+            <div class="font-mono text-[0.78rem] leading-[1.8] break-all p-4 text-text-muted" id="code-tmpl"></div>
+            <div class="text-[0.75rem] text-text-muted px-4 pb-3 flex items-center gap-1.5">
+              <span class="inline-flex items-center gap-1 mr-3"><div class="w-2 h-2 rounded-full shrink-0 bg-green"></div>real value</span>
+              <span class="inline-flex items-center gap-1 mr-3"><div class="w-2 h-2 rounded-full shrink-0 bg-[#f59e0b]"></div>your variable</span>
+            </div>
+          </div>
+
+          <div class="flex justify-end py-2.5 px-4 border-t border-border">
+            <button class="bg-surface-hover border border-border text-text-muted text-[0.78rem] font-semibold cursor-pointer rounded-md py-1 px-2.5 shrink-0 transition-colors duration-150 hover:text-green hover:border-green" id="copyUrl">Copy URL</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function checkAuth() {
+      const sessRes = await fetch('/o/session');
+      const sessData = await sessRes.json();
+      if (!sessData.users || sessData.users.length === 0) {
+        window.location.href = '/dev-login.html?return_url=/client-registration.html';
+      }
+    }
+    checkAuth();
+
+    async function logout() {
+      await fetch('/dev-logout', { method: 'POST' });
+      window.location.href = '/dev-login.html';
+    }
+
+    function showToast(msg, type='error'){
+      const c=document.getElementById('toast-container');
+      const t=document.createElement('div');
+      const styleClass = type === 'success' ? 'bg-[#0d2d0d] border-[#166534] text-[#86efac]' : 'bg-[#2d0d0d] border-[#991b1b] text-[#fca5a5]';
+      const icon = type === 'success' ? '✓' : '✕';
+      t.className=`flex items-center gap-3 py-[0.85rem] px-[1.1rem] rounded-[12px] text-[0.875rem] font-medium min-w-[240px] max-w-[340px] border animate-toastIn ${styleClass}`;
+      t.innerHTML=`<span class="text-base shrink-0">${icon}</span><span>${msg}</span><button class="ml-auto bg-transparent border-none text-current cursor-pointer opacity-60 hover:opacity-100 text-base leading-none p-0 w-auto" onclick="this.parentElement.remove()">✕</button>`;
+      c.appendChild(t);setTimeout(()=>t.remove(),4000);
+    }
+    function copyText(text, btn){
+      navigator.clipboard.writeText(text).then(()=>{
+        const o=btn.textContent; btn.textContent='Copied!';
+        btn.classList.add('text-green', 'border-green');
+        setTimeout(()=>{btn.textContent=o; btn.classList.remove('text-green', 'border-green');}, 2000);
+      });
+    }
+
+    let _clientId='', _redirectUri='', _fullUrl='', _tmplUrl='';
+    let _activeTab='full';
+
+    function switchUrl(tab){
+      _activeTab=tab;
+      const btnFull = document.getElementById('btn-full');
+      const btnTmpl = document.getElementById('btn-tmpl');
+      
+      if (tab === 'full') {
+        btnFull.className = "flex-1 py-2 px-2 border-none bg-green text-[#0a0f0a] text-[0.78rem] font-semibold cursor-pointer rounded-md transition-all duration-150";
+        btnTmpl.className = "flex-1 py-2 px-2 border-none bg-transparent text-text-muted text-[0.78rem] font-semibold cursor-pointer rounded-md transition-all duration-150";
+        document.getElementById('panel-full').classList.replace('hidden', 'block');
+        document.getElementById('panel-tmpl').classList.replace('block', 'hidden');
+      } else {
+        btnTmpl.className = "flex-1 py-2 px-2 border-none bg-green text-[#0a0f0a] text-[0.78rem] font-semibold cursor-pointer rounded-md transition-all duration-150";
+        btnFull.className = "flex-1 py-2 px-2 border-none bg-transparent text-text-muted text-[0.78rem] font-semibold cursor-pointer rounded-md transition-all duration-150";
+        document.getElementById('panel-full').classList.replace('block', 'hidden');
+        document.getElementById('panel-tmpl').classList.replace('hidden', 'block');
+      }
+    }
+
+    function buildUrls(clientId, redirectUri){
+      const base=`${window.location.origin}/o/authorize`;
+      _fullUrl=`${base}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&state=YOUR_RANDOM_STATE`;
+      _tmplUrl=`${base}?client_id=\${CLIENT_ID}&redirect_uri=\${REDIRECT_URI}&response_type=code&state=\${STATE}`;
+
+      const f=`<span class="text-[#86efac]">${base}?client_id=</span>`+
+               `<span class="text-green font-bold">${clientId}</span>`+
+               `<span class="text-[#86efac]">&amp;redirect_uri=</span>`+
+               `<span class="text-green font-bold">${encodeURIComponent(redirectUri)}</span>`+
+               `<span class="text-[#86efac]">&amp;response_type=code&amp;state=</span>`+
+               `<span class="text-green font-bold">YOUR_RANDOM_STATE</span>`;
+
+      const t=`<span class="text-[#86efac]">${base}?client_id=</span>`+
+               `<span class="text-[#f59e0b] font-bold">\${CLIENT_ID}</span>`+
+               `<span class="text-[#86efac]">&amp;redirect_uri=</span>`+
+               `<span class="text-[#f59e0b] font-bold">\${REDIRECT_URI}</span>`+
+               `<span class="text-[#86efac]">&amp;response_type=code&amp;state=</span>`+
+               `<span class="text-[#f59e0b] font-bold">\${STATE}</span>`;
+
+      document.getElementById('code-full').innerHTML=f;
+      document.getElementById('code-tmpl').innerHTML=t;
+    }
+
+    document.getElementById('copyId').addEventListener('click',()=>copyText(document.getElementById('showClientId').textContent,document.getElementById('copyId')));
+    document.getElementById('copySecret').addEventListener('click',()=>copyText(document.getElementById('showClientSecret').textContent,document.getElementById('copySecret')));
+    document.getElementById('copyUrl').addEventListener('click',()=>{
+      const url=_activeTab==='full'?_fullUrl:_tmplUrl;
+      copyText(url,document.getElementById('copyUrl'));
+    });
+
+    document.getElementById('clientForm').addEventListener('submit',async(e)=>{
+      e.preventDefault();
+      const btn=document.getElementById('createBtn');
+      const name=document.getElementById('name').value.trim();
+      const redirectUris=document.getElementById('redirectUris').value.split(',').map(u=>u.trim()).filter(Boolean);
+      btn.disabled=true;
+      btn.innerHTML='<div class="w-4 h-4 border-2 border-[rgba(10,15,10,0.3)] border-t-[#0a0f0a] rounded-full animate-spin"></div>';
+      try{
+        const res=await fetch('/clients',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,redirectUris})});
+        const data=await res.json();
+        if(res.ok){
+          document.getElementById('appNameTitle').textContent=data.name;
+          document.getElementById('showClientId').textContent=data.clientId;
+          document.getElementById('showClientSecret').textContent=data.clientSecret;
+          buildUrls(data.clientId, redirectUris[0]||'YOUR_REDIRECT_URI');
+          document.getElementById('formCard').classList.add('hidden');
+          document.getElementById('resultCard').classList.remove('hidden');
+          showToast('Application registered successfully!','success');
+        }else{
+          showToast(data.message||'Failed to create application.');
+          btn.innerHTML='Create Application';btn.disabled=false;
+        }
+      }catch{
+        showToast('Network error. Please try again.');
+        btn.innerHTML='Create Application';btn.disabled=false;
+      }
+    });
+  </script>
+</body>
+</html>

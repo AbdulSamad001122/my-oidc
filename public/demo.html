@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyAwesomeApp — Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0a0f0a',
+            surface: '#111a11',
+            'surface-hover': '#162016',
+            border: '#1f2f1f',
+            green: '#22c55e',
+            'green-dim': '#16a34a',
+            text: '#e8f5e9',
+            'text-muted': '#6b8f6b'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['SFMono-Regular', 'Consolas', 'monospace']
+          },
+          animation: {
+            toastIn: 'toastIn 0.25s ease',
+            spin: 'spin 0.7s linear infinite',
+          },
+          keyframes: {
+            toastIn: {
+              '0%': { opacity: 0, transform: 'translateX(20px)' },
+              '100%': { opacity: 1, transform: 'translateX(0)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-bg text-text font-sans flex justify-center items-center min-h-screen py-8 px-4 antialiased">
+  <div id="toast-container" class="fixed top-5 right-5 flex flex-col gap-2.5 z-[9999]"></div>
+  <div class="bg-surface border border-border rounded-[18px] py-10 px-8 w-full max-w-[440px]">
+    <!-- Guest View -->
+    <div id="guestView" class="block">
+      <div class="text-5xl text-center mb-5">🚀</div>
+      <h1 class="text-2xl font-bold text-center mb-2">MyAwesomeApp</h1>
+      <p class="text-[0.9rem] text-text-muted text-center mb-8 leading-relaxed">This is a demo third-party application.<br>Sign in with MyOIDC to see the full authorization flow in action.</p>
+      <button class="w-full py-3.5 bg-green text-[#0a0f0a] border-none rounded-lg text-base font-bold cursor-pointer flex items-center justify-center gap-3 transition-all duration-150 hover:bg-green-dim active:scale-98 disabled:opacity-55 disabled:cursor-not-allowed" id="loginBtn">
+        <div class="w-5 h-5 bg-white rounded flex items-center justify-center text-[0.7rem] font-bold text-[#0a0f0a] shrink-0">ID</div>
+        Continue with MyOIDC
+      </button>
+    </div>
+
+    <!-- Profile View -->
+    <div id="profileView" class="hidden">
+      <div class="flex items-center gap-5 mb-7 pb-7 border-b border-border">
+        <div class="w-14 h-14 rounded-full bg-green text-[#0a0f0a] flex items-center justify-center font-bold text-2xl shrink-0" id="avatarText">?</div>
+        <div>
+          <div class="text-[1.1rem] font-bold mb-1" id="profileName"></div>
+          <div class="text-[0.85rem] text-text-muted" id="profileEmail"></div>
+        </div>
+      </div>
+      <div>
+        <div class="text-[0.75rem] font-semibold text-text-muted uppercase tracking-wider mb-3">ID Token Claims</div>
+        <div id="claimsList"></div>
+      </div>
+      <button class="mt-7 w-full py-3 bg-transparent text-[#f87171] border border-[#3f1414] rounded-lg text-[0.9rem] font-semibold cursor-pointer transition-colors duration-150 hover:bg-[rgba(248,113,113,0.08)]" id="logoutBtn">Sign out of demo app</button>
+    </div>
+  </div>
+
+  <script>
+    const OIDC_URL='http://localhost:8000';
+    const APP_URL='http://localhost:8000/demo.html';
+
+    function showToast(msg, type='error'){
+      const c=document.getElementById('toast-container');
+      const t=document.createElement('div');
+      const styleClass = type === 'success' ? 'bg-[#0d2d0d] border-[#166534] text-[#86efac]' : 'bg-[#2d0d0d] border-[#991b1b] text-[#fca5a5]';
+      const icon = type === 'success' ? '✓' : '✕';
+      t.className=`flex items-center gap-3 py-[0.85rem] px-[1.1rem] rounded-[12px] text-[0.875rem] font-medium min-w-[240px] max-w-[340px] border animate-toastIn ${styleClass}`;
+      t.innerHTML=`<span class="text-base shrink-0">${icon}</span><span>${msg}</span><button class="ml-auto bg-transparent border-none text-current cursor-pointer opacity-60 hover:opacity-100 text-base leading-none p-0 w-auto" onclick="this.parentElement.remove()">✕</button>`;
+      c.appendChild(t);setTimeout(()=>t.remove(),4000);
+    }
+
+    async function ensureClientRegistered(){
+      let cid=localStorage.getItem('demo_client_id');
+      let cs=localStorage.getItem('demo_client_secret');
+      if(!cid){
+        const res=await fetch(`${OIDC_URL}/clients`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'MyAwesomeApp Demo',redirectUris:[APP_URL]})});
+        const data=await res.json();
+        cid=data.clientId;cs=data.clientSecret;
+        localStorage.setItem('demo_client_id',cid);
+        localStorage.setItem('demo_client_secret',cs);
+      }
+      return{clientId:cid,clientSecret:cs};
+    }
+
+    document.getElementById('loginBtn').addEventListener('click',async()=>{
+      const btn=document.getElementById('loginBtn');
+      btn.disabled=true;
+      btn.innerHTML='<div class="w-4 h-4 border-2 border-[rgba(10,15,10,0.3)] border-t-[#0a0f0a] rounded-full animate-spin"></div> Connecting...';
+      try{
+        const{clientId}=await ensureClientRegistered();
+        const state=Math.random().toString(36).substring(7);
+        localStorage.setItem('demo_state',state);
+        window.location.href=`${OIDC_URL}/o/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(APP_URL)}&response_type=code&state=${state}`;
+      }catch{
+        showToast('Failed to connect. Is the server running?');
+        btn.disabled=false;
+        btn.innerHTML='<div class="w-5 h-5 bg-white rounded flex items-center justify-center text-[0.7rem] font-bold text-[#0a0f0a] shrink-0">ID</div> Continue with MyOIDC';
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click',()=>{
+      localStorage.removeItem('demo_access_token');
+      localStorage.removeItem('demo_id_token');
+      document.getElementById('profileView').style.display='none';
+      document.getElementById('guestView').style.display='block';
+    });
+
+    function parseJwt(token){
+      try{
+        const b=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+        return JSON.parse(decodeURIComponent(atob(b).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+      }catch{return null;}
+    }
+
+    function showProfile(){
+      const token=localStorage.getItem('demo_id_token');
+      if(!token)return;
+      const claims=parseJwt(token);
+      if(!claims)return;
+
+      document.getElementById('guestView').style.display='none';
+      document.getElementById('profileView').style.display='block';
+      document.getElementById('avatarText').textContent=(claims.name||'U').charAt(0).toUpperCase();
+      document.getElementById('profileName').textContent=claims.name||'User';
+      document.getElementById('profileEmail').textContent=claims.email||'';
+
+      const skip=['iss','iat'];
+      const cl=document.getElementById('claimsList');
+      cl.innerHTML='';
+      Object.entries(claims).filter(([k])=>!skip.includes(k)).forEach(([k,v])=>{
+        const row=document.createElement('div');
+        row.className='flex justify-between items-center py-2.5 border-b border-border gap-4 last:border-none';
+        const val=k==='email_verified'
+          ?`<span class="text-[0.72rem] py-0.5 px-2 rounded-full bg-[#0d2d0d] border border-[#166534] text-[#86efac]">${v}</span>`
+          :`<span class="text-[0.82rem] font-mono text-green text-right break-all">${String(v).length>30?String(v).slice(0,28)+'…':v}</span>`;
+        row.innerHTML=`<span class="text-[0.82rem] text-text-muted shrink-0">${k}</span>${val}`;
+        cl.appendChild(row);
+      });
+    }
+
+    async function handleCallback(){
+      const urlParams=new URLSearchParams(window.location.search);
+      const code=urlParams.get('code');
+      const state=urlParams.get('state');
+      const error=urlParams.get('error');
+
+      if(error){
+        showToast('Authentication error: '+error);
+        window.history.replaceState({},document.title,window.location.pathname);
+        return;
+      }
+      if(!code)return;
+
+      const saved=localStorage.getItem('demo_state');
+      if(state!==saved){showToast('State mismatch — possible CSRF!');return;}
+
+      try{
+        const{clientId,clientSecret}=await ensureClientRegistered();
+        const res=await fetch(`${OIDC_URL}/o/token`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({grant_type:'authorization_code',code,client_id:clientId,client_secret:clientSecret,redirect_uri:APP_URL})});
+        const data=await res.json();
+        if(data.access_token){
+          localStorage.setItem('demo_access_token',data.access_token);
+          localStorage.setItem('demo_id_token',data.id_token);
+        }else{
+          showToast('Token exchange failed.');
+        }
+      }catch{
+        showToast('Network error during token exchange.');
+      }
+      window.history.replaceState({},document.title,window.location.pathname);
+      showProfile();
+    }
+
+    handleCallback();
+    showProfile();
+  </script>
+</body>
+</html>

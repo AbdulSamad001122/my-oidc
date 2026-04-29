@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer Portal — MyOIDC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0a0f0a',
+            surface: '#111a11',
+            border: '#1f2f1f',
+            green: '#22c55e',
+            'green-dim': '#16a34a',
+            text: '#e8f5e9',
+            'text-muted': '#6b8f6b',
+            error: '#f87171'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          animation: {
+            toastIn: 'toastIn 0.25s ease',
+            spin: 'spin 0.7s linear infinite',
+          },
+          keyframes: {
+            toastIn: {
+              '0%': { opacity: 0, transform: 'translateX(20px)' },
+              '100%': { opacity: 1, transform: 'translateX(0)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-bg text-text font-sans flex justify-center items-center min-h-screen antialiased">
+  <div id="toast-container" class="fixed top-5 right-5 flex flex-col gap-2.5 z-[9999]"></div>
+
+  <div class="bg-surface border border-border rounded-[18px] py-10 px-8 w-full max-w-[400px]">
+    <div class="w-11 h-11 bg-green rounded-[10px] flex items-center justify-center mx-auto mb-6 text-xl">👨‍💻</div>
+    <h1 id="title" class="text-[1.35rem] font-bold text-center text-text mb-1.5">Developer Login</h1>
+    <p id="subtitle" class="text-center text-[0.875rem] text-text-muted mb-8">Sign in to manage your OAuth applications.</p>
+
+    <!-- Navigation Tabs -->
+    <div class="flex gap-2 mb-6 p-1 bg-bg border border-border rounded-lg">
+      <button id="tabLogin" class="flex-1 py-2 text-[0.85rem] font-bold rounded-md transition-colors bg-surface text-green shadow-sm" onclick="switchTab('login')">Sign In</button>
+      <button id="tabSignup" class="flex-1 py-2 text-[0.85rem] font-bold rounded-md transition-colors text-text-muted hover:text-text" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+
+    <!-- Sign In Form -->
+    <form id="loginForm">
+      <div class="mb-4.5">
+        <label class="block text-[0.8rem] font-medium text-text-muted mb-1.5 uppercase tracking-wider">Email</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" required class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors focus:outline-none focus:border-green">
+      </div>
+      <div class="mb-4.5 mt-4">
+        <label class="block text-[0.8rem] font-medium text-text-muted mb-1.5 uppercase tracking-wider">Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors focus:outline-none focus:border-green">
+      </div>
+      <button type="submit" id="loginBtn" class="w-full py-3 bg-green text-[#0a0f0a] border-none rounded-lg text-[0.925rem] font-bold transition-all hover:bg-green-dim disabled:opacity-55 mt-6 flex justify-center items-center h-12">
+        Sign in
+      </button>
+    </form>
+
+    <!-- Sign Up Form -->
+    <form id="signupForm" class="hidden">
+      <div class="mb-4.5">
+        <label class="block text-[0.8rem] font-medium text-text-muted mb-1.5 uppercase tracking-wider">First Name</label>
+        <input type="text" id="signupFirstName" placeholder="John" required class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors focus:outline-none focus:border-green">
+      </div>
+      <div class="mb-4.5 mt-4">
+        <label class="block text-[0.8rem] font-medium text-text-muted mb-1.5 uppercase tracking-wider">Email</label>
+        <input type="email" id="signupEmail" placeholder="you@example.com" required class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors focus:outline-none focus:border-green">
+      </div>
+      <div class="mb-4.5 mt-4">
+        <label class="block text-[0.8rem] font-medium text-text-muted mb-1.5 uppercase tracking-wider">Password</label>
+        <input type="password" id="signupPassword" placeholder="••••••••" required minlength="6" class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors focus:outline-none focus:border-green">
+      </div>
+      <button type="submit" id="signupBtn" class="w-full py-3 bg-green text-[#0a0f0a] border-none rounded-lg text-[0.925rem] font-bold transition-all hover:bg-green-dim disabled:opacity-55 mt-6 flex justify-center items-center h-12">
+        Create Account
+      </button>
+    </form>
+  </div>
+
+  <script>
+    function showToast(message, type = 'error') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const styleClass = type === 'success' ? 'bg-[#0d2d0d] border-[#166534] text-[#86efac]' : 'bg-[#2d0d0d] border-[#991b1b] text-[#fca5a5]';
+      const icon = type === 'success' ? '✓' : '✕';
+      toast.className = `flex items-center gap-3 py-[0.85rem] px-[1.1rem] rounded-[12px] text-[0.875rem] font-medium min-w-[240px] max-w-[340px] border animate-toastIn ${styleClass}`;
+      toast.innerHTML = `<span class="text-base shrink-0">${icon}</span><span>${message}</span><button class="ml-auto bg-transparent text-current opacity-60 hover:opacity-100" onclick="this.parentElement.remove()">✕</button>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const returnUrl = urlParams.get('return_url') || '/admin.html';
+
+    function switchTab(tab) {
+      const loginForm = document.getElementById('loginForm');
+      const signupForm = document.getElementById('signupForm');
+      const tabLogin = document.getElementById('tabLogin');
+      const tabSignup = document.getElementById('tabSignup');
+      const title = document.getElementById('title');
+      const subtitle = document.getElementById('subtitle');
+
+      if (tab === 'login') {
+        loginForm.classList.remove('hidden');
+        signupForm.classList.add('hidden');
+        tabLogin.className = "flex-1 py-2 text-[0.85rem] font-bold rounded-md transition-colors bg-surface text-green shadow-sm";
+        tabSignup.className = "flex-1 py-2 text-[0.85rem] font-bold rounded-md transition-colors text-text-muted hover:text-text";
+        title.innerText = "Developer Login";
+        subtitle.innerText = "Sign in to manage your OAuth applications.";
+      } else {
+        loginForm.classList.add('hidden');
+        signupForm.classList.remove('hidden');
+        tabSignup.className = "flex-1 py-2 text-[0.85rem] font-bold rounded-md transition-colors bg-surface text-green shadow-sm";
+        tabLogin.className = "flex-1 py-2 text-[0.85rem] font-bold rounded-md transition-colors text-text-muted hover:text-text";
+        title.innerText = "Create Developer Account";
+        subtitle.innerText = "Register to start building with MyOIDC.";
+      }
+    }
+
+    function setLoading(btn, isLoading, text) {
+      btn.disabled = isLoading;
+      if (isLoading) {
+        btn.innerHTML = '<div class="w-4 h-4 border-2 border-[rgba(10,15,10,0.3)] border-t-[#0a0f0a] rounded-full animate-spin"></div>';
+      } else {
+        btn.innerHTML = text;
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      setLoading(btn, true);
+      try {
+        const res = await fetch('/dev-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        if (res.ok) window.location.href = returnUrl;
+        else {
+          const data = await res.json();
+          showToast(data.message || 'Login failed.');
+        }
+      } catch (err) {
+        showToast('Network error. Please try again.');
+      } finally {
+        setLoading(btn, false, 'Sign in');
+      }
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('signupBtn');
+      const firstName = document.getElementById('signupFirstName').value;
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
+
+      setLoading(btn, true);
+      try {
+        const res = await fetch('/o/authenticate/sign-up', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ firstName, email, password })
+        });
+        
+        if (res.ok) {
+          // Immediately login after successful signup
+          const loginRes = await fetch('/dev-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          if (loginRes.ok) window.location.href = returnUrl;
+          else {
+            showToast('Account created but login failed. Please sign in.', 'error');
+            switchTab('login');
+          }
+        } else {
+          const data = await res.json();
+          showToast(data.message || 'Signup failed.');
+        }
+      } catch (err) {
+        showToast('Network error. Please try again.');
+      } finally {
+        setLoading(btn, false, 'Create Account');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer Admin — MyOIDC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0a0f0a',
+            surface: '#111a11',
+            'surface-hover': '#162016',
+            border: '#1f2f1f',
+            green: '#22c55e',
+            'green-dim': '#16a34a',
+            text: '#e8f5e9',
+            'text-muted': '#6b8f6b',
+            error: '#f87171'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['SFMono-Regular', 'Consolas', 'monospace']
+          },
+          animation: {
+            toastIn: 'toastIn 0.25s ease',
+            spin: 'spin 0.7s linear infinite',
+          },
+          keyframes: {
+            toastIn: {
+              '0%': { opacity: 0, transform: 'translateX(20px)' },
+              '100%': { opacity: 1, transform: 'translateX(0)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-bg text-text font-sans min-h-screen antialiased">
+  <div id="toast-container" class="fixed top-5 right-5 flex flex-col gap-2.5 z-[9999]"></div>
+
+  <nav class="border-b border-border bg-surface sticky top-0 z-10">
+    <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-green rounded-lg flex items-center justify-center text-[1rem]">🔐</div>
+        <span class="font-bold text-[1.05rem]">MyOIDC Developer</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="/client-registration.html" class="bg-green text-[#0a0f0a] px-4 py-2 rounded-lg font-bold text-[0.85rem] hover:bg-green-dim transition-colors">Register App</a>
+        <button onclick="logout()" class="border border-border text-text-muted px-4 py-2 rounded-lg font-bold text-[0.85rem] hover:text-text hover:border-text-muted transition-colors">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-5xl mx-auto px-6 py-10">
+    <div class="mb-8 flex items-end justify-between">
+      <div>
+        <h1 class="text-2xl font-bold mb-1">Your Applications</h1>
+        <p class="text-[0.9rem] text-text-muted">Manage your registered OAuth2 applications.</p>
+      </div>
+    </div>
+
+    <div id="loading" class="flex justify-center py-12">
+      <div class="w-8 h-8 border-4 border-[rgba(34,197,94,0.3)] border-t-green rounded-full animate-spin"></div>
+    </div>
+
+    <div id="appsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
+      <!-- Apps will be injected here -->
+    </div>
+
+    <div id="emptyState" class="hidden text-center py-16 bg-surface border border-border rounded-2xl">
+      <div class="text-5xl mb-4">📦</div>
+      <h2 class="text-xl font-bold mb-2">No applications found</h2>
+      <p class="text-[0.9rem] text-text-muted mb-6">You haven't registered any applications yet.</p>
+      <a href="/client-registration.html" class="inline-block bg-green text-[#0a0f0a] px-5 py-2.5 rounded-lg font-bold text-[0.9rem] hover:bg-green-dim transition-colors">Register your first app</a>
+    </div>
+  </main>
+
+  <script>
+    function showToast(msg, type='error'){
+      const c=document.getElementById('toast-container');
+      const t=document.createElement('div');
+      const styleClass = type === 'success' ? 'bg-[#0d2d0d] border-[#166534] text-[#86efac]' : 'bg-[#2d0d0d] border-[#991b1b] text-[#fca5a5]';
+      const icon = type === 'success' ? '✓' : '✕';
+      t.className=`flex items-center gap-3 py-[0.85rem] px-[1.1rem] rounded-[12px] text-[0.875rem] font-medium min-w-[240px] max-w-[340px] border animate-toastIn ${styleClass}`;
+      t.innerHTML=`<span class="text-base shrink-0">${icon}</span><span>${msg}</span><button class="ml-auto bg-transparent border-none text-current cursor-pointer opacity-60 hover:opacity-100 text-base leading-none p-0 w-auto" onclick="this.parentElement.remove()">✕</button>`;
+      c.appendChild(t);setTimeout(()=>t.remove(),4000);
+    }
+
+    function copyText(text, btn){
+      navigator.clipboard.writeText(text).then(()=>{
+        const o=btn.textContent; btn.textContent='Copied!';
+        btn.classList.add('text-green', 'border-green');
+        setTimeout(()=>{btn.textContent=o; btn.classList.remove('text-green', 'border-green');}, 2000);
+      });
+    }
+
+    function renderAppCard(app) {
+      const uris = app.redirectUris.join(', ');
+      const loginUrl = `${window.location.origin}/o/authorize?client_id=${app.clientId}&redirect_uri=${encodeURIComponent(app.redirectUris[0] || '')}&response_type=code`;
+      
+      return `
+        <div class="bg-surface border border-border rounded-2xl p-6 transition-colors hover:border-[rgba(34,197,94,0.4)]">
+          <div class="flex justify-between items-start mb-5">
+            <div>
+              <h3 class="text-lg font-bold mb-1">${app.name}</h3>
+              <div class="inline-flex items-center gap-1.5 bg-[rgba(34,197,94,0.1)] text-green text-[0.7rem] font-bold py-1 px-2.5 rounded-full uppercase tracking-wide">Active</div>
+            </div>
+            <button onclick="deleteApp('${app.clientId}')" class="bg-[rgba(248,113,113,0.1)] text-error border border-[rgba(248,113,113,0.2)] text-[0.7rem] font-bold py-1.5 px-3 rounded hover:bg-[rgba(248,113,113,0.2)] transition-colors">Delete</button>
+          </div>
+          
+          <div class="space-y-4">
+            <div>
+              <div class="text-[0.75rem] font-semibold text-text-muted uppercase tracking-wider mb-1.5">Client ID</div>
+              <div class="flex items-center gap-2 bg-bg border border-border rounded-lg py-2 px-3">
+                <span class="font-mono text-[0.8rem] text-green flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">${app.clientId}</span>
+                <button class="bg-surface-hover border border-border text-text-muted text-[0.7rem] font-semibold cursor-pointer rounded py-1 px-2 shrink-0 transition-colors hover:text-green hover:border-green" onclick="copyText('${app.clientId}', this)">Copy</button>
+              </div>
+            </div>
+            
+            <div>
+              <div class="text-[0.75rem] font-semibold text-text-muted uppercase tracking-wider mb-1.5">Client Secret</div>
+              <div class="flex items-center gap-2 bg-bg border border-border rounded-lg py-2 px-3">
+                <span class="font-mono text-[0.8rem] text-text-muted flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">${app.clientSecret ? '••••••••••••••••••••••••' : 'Hidden'}</span>
+                ${app.clientSecret ? `<button class="bg-surface-hover border border-border text-text-muted text-[0.7rem] font-semibold cursor-pointer rounded py-1 px-2 shrink-0 transition-colors hover:text-green hover:border-green" onclick="copyText('${app.clientSecret}', this)">Copy</button>` : ''}
+              </div>
+            </div>
+
+            <div>
+              <div class="text-[0.75rem] font-semibold text-text-muted uppercase tracking-wider mb-1.5">Redirect URIs</div>
+              <div class="bg-bg border border-border rounded-lg py-2 px-3">
+                <span class="text-[0.8rem] text-text-muted break-all">${uris}</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="text-[0.75rem] font-semibold text-text-muted uppercase tracking-wider mb-1.5">Test Login URL</div>
+              <div class="flex items-center gap-2 bg-bg border border-border rounded-lg py-2 px-3">
+                <a href="${loginUrl}" target="_blank" class="font-mono text-[0.8rem] text-green flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap hover:underline cursor-pointer">${loginUrl}</a>
+                <button class="bg-surface-hover border border-border text-text-muted text-[0.7rem] font-semibold cursor-pointer rounded py-1 px-2 shrink-0 transition-colors hover:text-green hover:border-green" onclick="copyText('${loginUrl}', this)">Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function deleteApp(clientId) {
+      if (!confirm('Are you sure you want to delete this app? Users will no longer be able to authorize it.')) return;
+      try {
+        const res = await fetch('/clients/' + clientId, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('App deleted successfully', 'success');
+          loadApps();
+        } else {
+          showToast('Failed to delete app');
+        }
+      } catch (e) {
+        showToast('Network error');
+      }
+    }
+
+    async function logout() {
+      await fetch('/dev-logout', { method: 'POST' });
+      window.location.href = '/dev-login.html';
+    }
+
+    async function loadApps() {
+      const sessRes = await fetch('/o/session');
+      const sessData = await sessRes.json();
+      if (!sessData.users || sessData.users.length === 0) {
+        window.location.href = '/dev-login.html?return_url=/admin.html';
+        return;
+      }
+
+      const loading = document.getElementById('loading');
+      const grid = document.getElementById('appsGrid');
+      const empty = document.getElementById('emptyState');
+
+      try {
+        const res = await fetch('/clients');
+        if (res.ok) {
+          const apps = await res.json();
+          loading.classList.add('hidden');
+          
+          const appsArray = Array.isArray(apps) ? apps : (apps.clientId ? [apps] : []);
+
+          if (appsArray.length > 0) {
+            grid.innerHTML = appsArray.map(renderAppCard).join('');
+            grid.classList.remove('hidden');
+          } else {
+            empty.classList.remove('hidden');
+          }
+        } else {
+          throw new Error('Failed to fetch');
+        }
+      } catch (err) {
+        loading.classList.add('hidden');
+        
+        // Fallback to local storage demo data for demonstration purposes if backend endpoint fails
+        const demoId = localStorage.getItem('demo_client_id');
+        if (demoId) {
+          const demoApp = {
+            name: 'MyAwesomeApp Demo',
+            clientId: demoId,
+            clientSecret: localStorage.getItem('demo_client_secret'),
+            redirectUris: ['http://localhost:8000/demo.html']
+          };
+          empty.classList.add('hidden');
+          grid.innerHTML = renderAppCard(demoApp);
+          grid.classList.remove('hidden');
+        } else {
+          empty.classList.remove('hidden');
+        }
+      }
+    }
+
+    loadApps();
+  </script>
+</body>
+</html>

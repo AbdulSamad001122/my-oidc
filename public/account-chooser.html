@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choose Account — MyOIDC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0a0f0a',
+            surface: '#111a11',
+            'surface-hover': '#162016',
+            border: '#1f2f1f',
+            green: '#22c55e',
+            'green-dim': '#16a34a',
+            text: '#e8f5e9',
+            'text-muted': '#6b8f6b',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-bg text-text font-sans flex justify-center items-center min-h-screen antialiased">
+  <div class="bg-surface border border-border rounded-[18px] py-8 px-7 w-full max-w-[420px]">
+    <div class="w-11 h-11 bg-green rounded-[10px] flex items-center justify-center mx-auto mb-6 text-xl">🔐</div>
+    <h1 class="text-xl font-bold text-center mb-1">Choose an account</h1>
+    <p class="text-center text-[0.85rem] text-text-muted mb-7">to continue to your application</p>
+
+    <div id="accountList" class="flex flex-col gap-2">
+      <div class="h-[62px] rounded-[12px] bg-border animate-pulse"></div>
+      <div class="h-[62px] rounded-[12px] bg-border animate-pulse"></div>
+    </div>
+
+    <div class="flex items-center gap-3 my-4">
+      <div class="flex-1 border-t border-border"></div>
+      <span class="text-xs text-text-muted whitespace-nowrap">or</span>
+      <div class="flex-1 border-t border-border"></div>
+    </div>
+
+    <div class="flex items-center gap-4 py-3.5 px-4 rounded-[12px] border border-dashed border-border cursor-pointer transition-colors duration-150 text-text-muted hover:border-green hover:text-green hover:bg-surface-hover" id="addAccountBtn">
+      <div class="w-10 h-10 rounded-full border-2 border-dashed border-current flex items-center justify-center text-lg shrink-0">+</div>
+      <span class="text-[0.9rem] font-medium">Add another account</span>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryParams = window.location.search;
+
+    document.getElementById('addAccountBtn').addEventListener('click', () => {
+      window.location.href = `/o/authorize${queryParams}&prompt=login`;
+    });
+
+    async function fetchAccounts() {
+      const res = await fetch('/o/session');
+      const data = await res.json();
+      const list = document.getElementById('accountList');
+      list.innerHTML = '';
+
+      if (data.users && data.users.length > 0) {
+        data.users.forEach(user => {
+          const card = document.createElement('div');
+          card.className = 'flex items-center gap-4 bg-bg border border-border py-3.5 px-4 rounded-[12px] cursor-pointer transition-colors duration-150 hover:border-green hover:bg-surface-hover';
+          card.innerHTML = `
+            <div class="w-10 h-10 rounded-full bg-green text-[#0a0f0a] flex items-center justify-center font-bold text-lg shrink-0">${user.avatar}</div>
+            <div class="flex-1 min-w-0">
+              <div class="font-semibold text-[0.9rem]">${user.name || 'User'}</div>
+              <div class="text-[0.8rem] text-text-muted truncate">${user.email}</div>
+            </div>
+            <span class="text-text-muted text-base shrink-0">›</span>
+          `;
+          card.addEventListener('click', () => {
+            window.location.href = `/consent.html${queryParams}&selected_user_id=${user.id}`;
+          });
+          list.appendChild(card);
+        });
+      } else {
+        window.location.href = `/o/authorize${queryParams}&prompt=login`;
+      }
+    }
+
+    fetchAccounts();
+  </script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — MyOIDC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0a0f0a',
+            surface: '#111a11',
+            'surface-hover': '#162016',
+            border: '#1f2f1f',
+            green: '#22c55e',
+            'green-dim': '#16a34a',
+            text: '#e8f5e9',
+            'text-muted': '#6b8f6b',
+            error: '#f87171'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          animation: {
+            toastIn: 'toastIn 0.25s ease',
+            spin: 'spin 0.7s linear infinite',
+          },
+          keyframes: {
+            toastIn: {
+              '0%': { opacity: 0, transform: 'translateX(20px)' },
+              '100%': { opacity: 1, transform: 'translateX(0)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-bg text-text font-sans flex justify-center items-center min-h-screen antialiased">
+  <div id="toast-container" class="fixed top-5 right-5 flex flex-col gap-2.5 z-[9999]"></div>
+
+  <div class="bg-surface border border-border rounded-[18px] py-10 px-8 w-full max-w-[400px]">
+    <div class="w-11 h-11 bg-green rounded-[10px] flex items-center justify-center mx-auto mb-6 text-xl">🔐</div>
+    <h1 id="formTitle" class="text-[1.35rem] font-bold text-center text-text mb-1.5">Sign in to continue</h1>
+    <p class="text-center text-[0.875rem] text-text-muted mb-8">An application is requesting access to your account.</p>
+
+    <div class="flex bg-bg rounded-lg p-[3px] mb-7">
+      <button class="flex-1 py-2.5 px-2 border-none bg-surface text-text text-[0.875rem] font-medium cursor-pointer rounded-md transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.3)]" id="tab-login" onclick="showTab('login')">Login</button>
+      <button class="flex-1 py-2.5 px-2 border-none bg-transparent text-text-muted text-[0.875rem] font-medium cursor-pointer rounded-md transition-all duration-150 hover:text-text" id="tab-signup" onclick="showTab('signup')">Sign Up</button>
+    </div>
+
+    <!-- Login Panel -->
+    <div class="block" id="panel-login">
+      <form id="authForm">
+        <div class="mb-4.5">
+          <label for="email" class="block text-[0.8rem] font-medium text-text-muted mb-1.5 uppercase tracking-wider">Email address</label>
+          <input type="email" id="email" placeholder="you@example.com" required autocomplete="email" class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors duration-150 focus:outline-none focus:border-green placeholder:text-text-muted">
+        </div>
+        <div class="mb-4.5">
+          <label for="password" class="block text-[0.8rem] font-medium text-text-muted mb-1.5 mt-4 uppercase tracking-wider">Password</label>
+          <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password" class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors duration-150 focus:outline-none focus:border-green placeholder:text-text-muted">
+        </div>
+        <button type="submit" class="w-full py-3 bg-green text-[#0a0f0a] border-none rounded-lg text-[0.925rem] font-bold cursor-pointer transition-all duration-150 hover:bg-green-dim active:scale-98 disabled:opacity-55 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2" id="loginBtn">
+          Sign in
+        </button>
+      </form>
+    </div>
+
+    <!-- Sign Up Panel -->
+    <div class="hidden" id="panel-signup">
+      <form id="signupForm">
+        <div class="flex gap-3 mb-4.5">
+          <div class="flex-1">
+            <label for="firstName" class="block text-[0.8rem] font-medium text-text-muted mb-1.5 uppercase tracking-wider">First name</label>
+            <input type="text" id="firstName" placeholder="John" required autocomplete="given-name" class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors duration-150 focus:outline-none focus:border-green placeholder:text-text-muted">
+          </div>
+          <div class="flex-1">
+            <label for="lastName" class="block text-[0.8rem] font-medium text-text-muted mb-1.5 uppercase tracking-wider">Last name</label>
+            <input type="text" id="lastName" placeholder="Doe" autocomplete="family-name" class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors duration-150 focus:outline-none focus:border-green placeholder:text-text-muted">
+          </div>
+        </div>
+        <div class="mb-4.5 mt-4">
+          <label for="regEmail" class="block text-[0.8rem] font-medium text-text-muted mb-1.5 uppercase tracking-wider">Email address</label>
+          <input type="email" id="regEmail" placeholder="you@example.com" required autocomplete="email" class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors duration-150 focus:outline-none focus:border-green placeholder:text-text-muted">
+        </div>
+        <div class="mb-4.5 mt-4">
+          <label for="regPassword" class="block text-[0.8rem] font-medium text-text-muted mb-1.5 uppercase tracking-wider">Password</label>
+          <input type="password" id="regPassword" placeholder="••••••••" required autocomplete="new-password" class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors duration-150 focus:outline-none focus:border-green placeholder:text-text-muted">
+        </div>
+        <button type="submit" class="w-full py-3 bg-green text-[#0a0f0a] border-none rounded-lg text-[0.925rem] font-bold cursor-pointer transition-all duration-150 hover:bg-green-dim active:scale-98 disabled:opacity-55 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2" id="signupBtn">
+          Create account
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function showToast(message, type = 'error') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const styleClass = type === 'success' ? 'bg-[#0d2d0d] border-[#166534] text-[#86efac]' : 'bg-[#2d0d0d] border-[#991b1b] text-[#fca5a5]';
+      const icon = type === 'success' ? '✓' : '✕';
+      toast.className = `flex items-center gap-3 py-[0.85rem] px-[1.1rem] rounded-[12px] text-[0.875rem] font-medium min-w-[240px] max-w-[340px] border animate-toastIn ${styleClass}`;
+      toast.innerHTML = `
+        <span class="text-base shrink-0">${icon}</span>
+        <span>${message}</span>
+        <button class="ml-auto bg-transparent border-none text-current cursor-pointer opacity-60 hover:opacity-100 text-base leading-none p-0 w-auto" onclick="this.parentElement.remove()">✕</button>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+
+    function setLoading(btn, loading) {
+      if (loading) {
+        btn.disabled = true;
+        btn.innerHTML = '<div class="w-4 h-4 border-2 border-[rgba(10,15,10,0.3)] border-t-[#0a0f0a] rounded-full animate-spin"></div>';
+      } else {
+        btn.disabled = false;
+      }
+    }
+
+    function showTab(tab) {
+      document.getElementById('panel-login').className = tab === 'login' ? 'block' : 'hidden';
+      document.getElementById('panel-signup').className = tab === 'signup' ? 'block' : 'hidden';
+      
+      const loginTab = document.getElementById('tab-login');
+      const signupTab = document.getElementById('tab-signup');
+      
+      if (tab === 'login') {
+        loginTab.className = "flex-1 py-2.5 px-2 border-none bg-surface text-text text-[0.875rem] font-medium cursor-pointer rounded-md transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.3)]";
+        signupTab.className = "flex-1 py-2.5 px-2 border-none bg-transparent text-text-muted text-[0.875rem] font-medium cursor-pointer rounded-md transition-all duration-150 hover:text-text";
+      } else {
+        signupTab.className = "flex-1 py-2.5 px-2 border-none bg-surface text-text text-[0.875rem] font-medium cursor-pointer rounded-md transition-all duration-150 shadow-[0_1px_4px_rgba(0,0,0,0.3)]";
+        loginTab.className = "flex-1 py-2.5 px-2 border-none bg-transparent text-text-muted text-[0.875rem] font-medium cursor-pointer rounded-md transition-all duration-150 hover:text-text";
+      }
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const client_id = urlParams.get('client_id');
+    const redirect_uri = urlParams.get('redirect_uri');
+    const state = urlParams.get('state');
+
+    document.getElementById('authForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (!client_id || !redirect_uri) {
+        showToast('Missing client_id or redirect_uri in the request.');
+        return;
+      }
+
+      setLoading(btn, true);
+      try {
+        const res = await fetch('/o/authorize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, client_id, redirect_uri, state })
+        });
+
+        if (res.ok) {
+          const newUrlParams = new URLSearchParams(window.location.search);
+          newUrlParams.delete('prompt');
+          window.location.href = window.location.pathname + '?' + newUrlParams.toString();
+        } else {
+          const data = await res.json();
+          showToast(data.message || 'Login failed.');
+          btn.innerHTML = 'Sign in';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        showToast('Network error. Please try again.');
+        btn.innerHTML = 'Sign in';
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('signupBtn');
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+
+      setLoading(btn, true);
+      try {
+        const res = await fetch('/o/authenticate/sign-up', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ firstName, lastName, email, password })
+        });
+
+        if (res.ok) {
+          const loginRes = await fetch('/o/authorize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, client_id, redirect_uri, state })
+          });
+          if (loginRes.ok) {
+            const newUrlParams = new URLSearchParams(window.location.search);
+            newUrlParams.delete('prompt');
+            window.location.href = window.location.pathname + '?' + newUrlParams.toString();
+          }
+        } else {
+          const data = await res.json();
+          showToast(data.message || 'Sign up failed.');
+          btn.innerHTML = 'Create account';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        showToast('Network error. Please try again.');
+        btn.innerHTML = 'Create account';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

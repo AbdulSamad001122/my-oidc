@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            maxlength: 66, // SHA-256 hex
+            maxlength: 66, 
             default: null,
         },
         salt: {
@@ -43,3 +43,23 @@ const userSchema = new mongoose.Schema(
 );
 
 export const User = mongoose.model("User", userSchema);
+
+const clientSchema = new mongoose.Schema({
+    clientId: { type: String, required: true, unique: true },
+    clientSecret: { type: String, required: true },
+    redirectUris: { type: [String], required: true },
+    name: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+});
+
+export const Client = mongoose.model("Client", clientSchema);
+
+const authCodeSchema = new mongoose.Schema({
+    code: { type: String, required: true, unique: true },
+    clientId: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    redirectUri: { type: String, required: true },
+    expiresAt: { type: Date, required: true }
+});
+
+export const AuthCode = mongoose.model("AuthCode", authCodeSchema);
