@@ -99,7 +99,7 @@ export const devLogin = async (req, res) => {
     return res.status(401).json({ message: "Invalid email or password." });
   }
 
-  const loggedInUsers = getLoggedInUsersFromToken(req.cookies.session_token);
+  const loggedInUsers = getLoggedInUsersFromToken(req.cookies.dev_session_token);
   
   const userExists = loggedInUsers.find(u => u.id === user._id.toString());
   if (!userExists) {
@@ -112,17 +112,22 @@ export const devLogin = async (req, res) => {
   }
 
   const token = generateSessionToken(loggedInUsers);
-  res.cookie("session_token", token, { httpOnly: true, maxAge: 7 * 24 * 3600 * 1000 });
+  res.cookie("dev_session_token", token, { httpOnly: true, maxAge: 7 * 24 * 3600 * 1000 });
   
   return res.json({ ok: true });
 };
 
 export const devLogout = (req, res) => {
-  res.clearCookie("session_token");
+  res.clearCookie("dev_session_token");
   return res.json({ ok: true });
 };
 
 export const getSession = (req, res) => {
   const users = getLoggedInUsersFromToken(req.cookies.session_token);
+  return res.json({ users });
+};
+
+export const getDevSession = (req, res) => {
+  const users = getLoggedInUsersFromToken(req.cookies.dev_session_token);
   return res.json({ users });
 };

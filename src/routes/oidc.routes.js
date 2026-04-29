@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { signIn, signUp, getUserInfo, devLogin, devLogout, getSession } from "../controllers/auth.controller.js";
+import { signIn, signUp, getUserInfo, devLogin, devLogout, getSession, getDevSession } from "../controllers/auth.controller.js";
 import { createClient, getClients, deleteClient, getClientPage } from "../controllers/client.controller.js";
 import { getOpenIdConfiguration, getJwks, getAuthenticatePage, getDocsPage, getAuthorizePage, authorize, consent, token } from "../controllers/oauth.controller.js";
 
@@ -22,6 +22,7 @@ router.delete("/clients/:id", deleteClient);
 router.post("/dev-login", devLogin);
 router.post("/dev-logout", devLogout);
 router.get("/o/session", getSession);
+router.get("/dev-session", getDevSession);
 
 router.get("/o/authorize", getAuthorizePage);
 router.post("/o/authorize", authorize);

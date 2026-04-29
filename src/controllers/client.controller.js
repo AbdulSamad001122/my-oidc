@@ -11,7 +11,7 @@ export const createClient = async (req, res) => {
 
   let userId = null;
   if (name !== 'MyAwesomeApp Demo') {
-    const loggedInUsers = getLoggedInUsersFromToken(req.cookies.session_token);
+    const loggedInUsers = getLoggedInUsersFromToken(req.cookies.dev_session_token);
     if (loggedInUsers.length === 0) {
       return res.status(401).json({ message: "Unauthorized. Please log in first." });
     }
@@ -38,7 +38,7 @@ export const createClient = async (req, res) => {
 };
 
 export const getClients = async (req, res) => {
-  const loggedInUsers = getLoggedInUsersFromToken(req.cookies.session_token);
+  const loggedInUsers = getLoggedInUsersFromToken(req.cookies.dev_session_token);
   if (loggedInUsers.length === 0) {
     return res.status(401).json({ message: "Unauthorized." });
   }
@@ -49,7 +49,7 @@ export const getClients = async (req, res) => {
 };
 
 export const deleteClient = async (req, res) => {
-  const loggedInUsers = getLoggedInUsersFromToken(req.cookies.session_token);
+  const loggedInUsers = getLoggedInUsersFromToken(req.cookies.dev_session_token);
   if (loggedInUsers.length === 0) {
     return res.status(401).json({ message: "Unauthorized." });
   }

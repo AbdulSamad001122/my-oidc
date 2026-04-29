@@ -171,7 +171,7 @@
     }
 
     async function loadApps() {
-      const sessRes = await fetch('/o/session');
+      const sessRes = await fetch('/dev-session');
       const sessData = await sessRes.json();
       if (!sessData.users || sessData.users.length === 0) {
         window.location.href = '/dev-login.html?return_url=/admin.html';

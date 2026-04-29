@@ -34,16 +34,28 @@ const formatKey = (key) => {
   return formatted;
 };
 
-if (process.env.PRIVATE_KEY && process.env.PUBLIC_KEY) {
+if (process.env.PRIVATE_KEY) {
   privateKey = formatKey(process.env.PRIVATE_KEY);
-  publicKey = formatKey(process.env.PUBLIC_KEY);
 } else {
   try {
     privateKey = readFileSync(path.resolve(process.cwd(), "cert", "private-key.pem"), "utf8");
+  } catch (err) {
+    console.error("Warning: Could not find cert/private-key.pem. Make sure PRIVATE_KEY environment variable is set.");
+  }
+}
+
+if (process.env.PUBLIC_KEY) {
+  publicKey = formatKey(process.env.PUBLIC_KEY);
+} else {
+  try {
     publicKey = readFileSync(path.resolve(process.cwd(), "cert", "public-key.pub"), "utf8");
   } catch (err) {
-    console.error("Warning: Could not find cert files. Make sure PRIVATE_KEY and PUBLIC_KEY environment variables are set.");
+    console.error("Warning: Could not find cert/public-key.pub. Make sure PUBLIC_KEY environment variable is set.");
   }
+}
+
+if (!privateKey) {
+  console.error("CRITICAL ERROR: privateKey is undefined! JWT signing will fail.");
 }
 
 export const PRIVATE_KEY = privateKey;
