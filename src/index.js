@@ -14,6 +14,12 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.static(path.resolve("public")));
 
+// Ensure DB connection for serverless endpoints
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
+
 // Basic Routes
 app.get("/", (req, res) => res.json({ message: "Hello from Auth Server" }));
 
@@ -24,7 +30,11 @@ app.get("/health", (req, res) =>
 // OIDC & Auth Routes
 app.use("/", oidcRoutes);
 
-app.listen(PORT, async () => {
-  await connectDB();
-  console.log(`AuthServer is running on PORT ${PORT}`);
-});
+if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+  app.listen(PORT, async () => {
+    await connectDB();
+    console.log(`AuthServer is running on PORT ${PORT}`);
+  });
+}
+
+export default app;
