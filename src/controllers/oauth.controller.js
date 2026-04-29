@@ -34,6 +34,10 @@ export const getDocsPage = (req, res) => {
   return res.sendFile(path.resolve("public", "docs.html"));
 };
 
+export const getConsentPage = (req, res) => {
+  return res.sendFile(path.resolve("public", "consent.html"));
+};
+
 export const getAuthorizePage = async (req, res) => {
   const { client_id, redirect_uri, response_type, prompt } = req.query;
   if (!client_id || !redirect_uri || response_type !== "code") {

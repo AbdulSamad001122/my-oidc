@@ -79,7 +79,7 @@
             <span class="text-text-muted text-base shrink-0">›</span>
           `;
           card.addEventListener('click', () => {
-            window.location.href = `/consent.html${queryParams}&selected_user_id=${user.id}`;
+            window.location.href = `/o/consent${queryParams}&selected_user_id=${user.id}`;
           });
           list.appendChild(card);
         });
