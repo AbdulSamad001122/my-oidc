@@ -113,10 +113,10 @@
             <div class="p-4 bg-codebg">
               <pre class="text-sm text-text-muted font-mono overflow-x-auto"><code>// Returns provider metadata:
 {
-  "issuer": "http://localhost:8000",
-  "authorization_endpoint": "http://localhost:8000/o/authorize",
-  "userinfo_endpoint": "http://localhost:8000/o/userinfo",
-  "jwks_uri": "http://localhost:8000/.well-known/jwks.json"
+  "issuer": "https://myoidc.example.com",
+  "authorization_endpoint": "https://myoidc.example.com/o/authorize",
+  "userinfo_endpoint": "https://myoidc.example.com/o/userinfo",
+  "jwks_uri": "https://myoidc.example.com/.well-known/jwks.json"
 }</code></pre>
             </div>
           </div>
@@ -220,8 +220,8 @@ Authorization: Bearer YOUR_ACCESS_TOKEN</code></pre>
           <ul class="list-disc list-inside space-y-2 text-sm text-text-muted">
             <li>Select <strong>OAuth 2.0</strong> in the Authorization tab.</li>
             <li>Set Grant Type to <strong>Authorization Code</strong>.</li>
-            <li>Auth URL: <code>http://localhost:8000/o/authorize</code></li>
-            <li>Access Token URL: <code>http://localhost:8000/o/token</code></li>
+            <li>Auth URL: <code>https://myoidc.example.com/o/authorize</code></li>
+            <li>Access Token URL: <code>https://myoidc.example.com/o/token</code></li>
             <li>Provide your <strong>Client ID</strong> and <strong>Client Secret</strong>.</li>
             <li>Click <strong>Get New Access Token</strong> to start the browser flow!</li>
           </ul>

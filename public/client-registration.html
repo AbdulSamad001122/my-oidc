@@ -41,20 +41,24 @@
     }
   </script>
 </head>
-<body class="bg-bg text-text font-sans flex justify-center items-start min-h-screen py-12 px-4 antialiased">
+<body class="bg-bg text-text font-sans min-h-screen antialiased">
   <div id="toast-container" class="fixed top-5 right-5 flex flex-col gap-2.5 z-[9999]"></div>
-  
-  <div class="w-full max-w-[480px]">
-    <div class="flex items-center justify-between mb-8">
+
+  <nav class="border-b border-border bg-surface sticky top-0 z-10">
+    <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-[38px] h-[38px] bg-green rounded-[9px] flex items-center justify-center text-[1.1rem]">🔐</div>
-        <span class="font-bold text-[1.1rem]">MyOIDC Developer</span>
+        <div class="w-8 h-8 bg-green rounded-lg flex items-center justify-center text-[1rem]">🔐</div>
+        <span class="font-bold text-[1.05rem]">MyOIDC Developer</span>
       </div>
-      <div class="flex gap-3">
-        <a href="/admin.html" class="text-[0.8rem] text-text-muted hover:text-green transition-colors font-semibold">Dashboard</a>
-        <button onclick="logout()" class="text-[0.8rem] text-text-muted hover:text-error transition-colors font-semibold">Logout</button>
+      <div class="flex items-center gap-3">
+        <a href="/admin.html" class="border border-border text-text-muted px-4 py-2 rounded-lg font-bold text-[0.85rem] hover:text-text hover:border-text-muted transition-colors">Dashboard</a>
+        <button onclick="logout()" class="border border-border text-text-muted px-4 py-2 rounded-lg font-bold text-[0.85rem] hover:text-text hover:border-text-muted transition-colors">Logout</button>
       </div>
     </div>
+  </nav>
+
+  <main class="flex justify-center items-start py-12 px-4">
+  <div class="w-full max-w-[480px]">
     
     <div class="bg-surface border border-border rounded-[18px] p-8 mb-6" id="formCard">
       <h1 class="text-[1.2rem] font-bold mb-1">Register an Application</h1>
@@ -66,7 +70,7 @@
         </div>
         <div class="mb-4.5 mt-4">
           <label for="redirectUris" class="block text-[0.78rem] font-semibold text-text-muted uppercase tracking-wider mb-1.5">Redirect URI(s)</label>
-          <input type="text" id="redirectUris" placeholder="http://localhost:3000/callback" required class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors duration-150 focus:outline-none focus:border-green placeholder:text-text-muted">
+          <input type="text" id="redirectUris" placeholder="https://myapp.example.com/callback" required class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors duration-150 focus:outline-none focus:border-green placeholder:text-text-muted">
           <div class="text-[0.78rem] text-text-muted mt-1.5">Separate multiple URIs with commas.</div>
         </div>
         <button type="submit" class="w-full py-3 bg-green text-[#0a0f0a] border-none rounded-lg text-[0.925rem] font-bold cursor-pointer transition-all duration-150 hover:bg-green-dim active:scale-98 disabled:opacity-55 disabled:cursor-not-allowed mt-6 flex items-center justify-center gap-2" id="createBtn">Create Application</button>
@@ -123,6 +127,7 @@
       </div>
     </div>
   </div>
+  </main>
 
   <script>
     async function checkAuth() {

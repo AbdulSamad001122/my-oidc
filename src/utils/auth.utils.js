@@ -3,7 +3,7 @@ import JWT from "jsonwebtoken";
 import { PRIVATE_KEY, PUBLIC_KEY } from "./cert.js";
 
 const PORT = process.env.PORT ?? 8000;
-export const ISSUER = `http://localhost:${PORT}`;
+export const ISSUER = process.env.ISSUER_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${PORT}`);
 
 export const hashPassword = (password, salt) => {
   return crypto.createHash("sha256").update(password + salt).digest("hex");
