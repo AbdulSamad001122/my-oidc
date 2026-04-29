@@ -1,12 +1,14 @@
 import { Router } from "express";
 import { signIn, signUp, getUserInfo, devLogin, devLogout, getSession } from "../controllers/auth.controller.js";
 import { createClient, getClients, deleteClient, getClientPage } from "../controllers/client.controller.js";
-import { getOpenIdConfiguration, getJwks, getAuthenticatePage, getAuthorizePage, authorize, consent, token } from "../controllers/oauth.controller.js";
+import { getOpenIdConfiguration, getJwks, getAuthenticatePage, getDocsPage, getAuthorizePage, authorize, consent, token } from "../controllers/oauth.controller.js";
 
 const router = Router();
 
 router.get("/.well-known/openid-configuration", getOpenIdConfiguration);
 router.get("/.well-known/jwks.json", getJwks);
+
+router.get("/docs", getDocsPage);
 
 router.get("/o/authenticate", getAuthenticatePage);
 router.post("/o/authenticate/sign-in", signIn);

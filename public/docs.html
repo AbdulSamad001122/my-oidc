@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation — MyOIDC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0a0f0a',
+            surface: '#111a11',
+            'surface-hover': '#162016',
+            border: '#1f2f1f',
+            green: '#22c55e',
+            'green-dim': '#16a34a',
+            text: '#e8f5e9',
+            'text-muted': '#6b8f6b',
+            codebg: '#080c08'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbar for code blocks */
+    pre::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    pre::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    pre::-webkit-scrollbar-thumb {
+      background: #1f2f1f;
+      border-radius: 4px;
+    }
+    pre::-webkit-scrollbar-thumb:hover {
+      background: #22c55e;
+    }
+  </style>
+</head>
+<body class="bg-bg text-text font-sans antialiased selection:bg-green selection:text-[#0a0f0a]">
+
+  <header class="border-b border-border bg-surface/50 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-green rounded-lg flex items-center justify-center text-sm">🔐</div>
+        <span class="font-bold text-lg tracking-tight">MyOIDC</span>
+        <span class="px-2 py-0.5 rounded text-xs font-medium bg-border text-text-muted ml-2">Docs</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="/client-registration.html" class="text-sm font-medium text-text-muted hover:text-green transition-colors">Client Portal</a>
+        <a href="/demo.html" class="text-sm font-medium text-text-muted hover:text-green transition-colors">Demo App</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-6 py-12">
+    <div class="space-y-12">
+
+      <!-- Hero -->
+      <section class="space-y-4">
+        <h1 class="text-4xl font-bold tracking-tight text-white">OIDC Provider Documentation</h1>
+        <p class="text-lg text-text-muted leading-relaxed">
+          Welcome to the MyOIDC developer documentation. This guide explains how to integrate your applications with our authentication server using the standard OpenID Connect (OIDC) Authorization Code flow.
+        </p>
+      </section>
+
+      <!-- Step 1: Registration -->
+      <section class="space-y-6">
+        <h2 class="text-2xl font-semibold border-b border-border pb-2 flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-border flex items-center justify-center text-sm text-green">1</span>
+          Register Your Application
+        </h2>
+        <div class="bg-surface border border-border rounded-xl p-6">
+          <p class="text-text-muted mb-4 leading-relaxed">
+            Before your application can authenticate users, it must be registered to obtain a Client ID and Client Secret.
+          </p>
+          <ol class="list-decimal list-inside space-y-2 text-sm text-text-muted">
+            <li>Go to the <a href="/client-registration.html" class="text-green hover:underline">Client Registration Portal</a>.</li>
+            <li>Create an account or log in as a developer.</li>
+            <li>Click "Register New Client" and provide your application's Name and Redirect URIs.</li>
+            <li>Save your <strong>Client ID</strong> and <strong>Client Secret</strong> securely. You will need these for the OAuth flow.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Step 2: Discovery endpoints -->
+      <section class="space-y-6">
+        <h2 class="text-2xl font-semibold border-b border-border pb-2 flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-border flex items-center justify-center text-sm text-green">2</span>
+          Discovery & Configuration
+        </h2>
+        <p class="text-text-muted leading-relaxed">
+          Our OIDC provider supports standard discovery endpoints, allowing OIDC client libraries to automatically configure themselves.
+        </p>
+        
+        <div class="space-y-4">
+          <div class="bg-surface border border-border rounded-xl overflow-hidden">
+            <div class="bg-border px-4 py-2 flex items-center gap-2">
+              <span class="text-xs font-bold text-green">GET</span>
+              <span class="text-sm font-mono text-text">/.well-known/openid-configuration</span>
+            </div>
+            <div class="p-4 bg-codebg">
+              <pre class="text-sm text-text-muted font-mono overflow-x-auto"><code>// Returns provider metadata:
+{
+  "issuer": "http://localhost:8000",
+  "authorization_endpoint": "http://localhost:8000/o/authorize",
+  "userinfo_endpoint": "http://localhost:8000/o/userinfo",
+  "jwks_uri": "http://localhost:8000/.well-known/jwks.json"
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Step 3: Auth Flow -->
+      <section class="space-y-6">
+        <h2 class="text-2xl font-semibold border-b border-border pb-2 flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-border flex items-center justify-center text-sm text-green">3</span>
+          Authorization Code Flow
+        </h2>
+        
+        <!-- Step 3.1 -->
+        <div class="space-y-3">
+          <h3 class="text-lg font-medium text-white">A. Redirect to Authorize Endpoint</h3>
+          <p class="text-sm text-text-muted">
+            Redirect the user's browser to the authorization endpoint to prompt them to log in and grant consent.
+          </p>
+          <div class="bg-surface border border-border rounded-xl overflow-hidden">
+            <div class="bg-border px-4 py-2 flex items-center gap-2">
+              <span class="text-xs font-bold text-green">GET</span>
+              <span class="text-sm font-mono text-text">/o/authorize</span>
+            </div>
+            <div class="p-4 bg-codebg">
+              <pre class="text-sm text-text-muted font-mono overflow-x-auto"><code>GET /o/authorize?client_id=YOUR_CLIENT_ID
+  &redirect_uri=YOUR_REDIRECT_URI
+  &response_type=code
+  &state=RANDOM_STRING</code></pre>
+            </div>
+          </div>
+          <p class="text-sm text-text-muted mt-2">
+            After successful login and consent, the server will redirect the user back to your <code>redirect_uri</code> with a <code>code</code> parameter.
+          </p>
+        </div>
+
+        <!-- Step 3.2 -->
+        <div class="space-y-3 mt-8">
+          <h3 class="text-lg font-medium text-white">B. Exchange Code for Tokens</h3>
+          <p class="text-sm text-text-muted">
+            From your backend server, make a POST request to exchange the authorization code for an ID Token and Access Token.
+          </p>
+          <div class="bg-surface border border-border rounded-xl overflow-hidden">
+            <div class="bg-border px-4 py-2 flex items-center gap-2">
+              <span class="text-xs font-bold text-yellow-500">POST</span>
+              <span class="text-sm font-mono text-text">/o/token</span>
+            </div>
+            <div class="p-4 bg-codebg">
+              <pre class="text-sm text-text-muted font-mono overflow-x-auto"><code>POST /o/token
+Content-Type: application/json
+
+{
+  "grant_type": "authorization_code",
+  "code": "AUTH_CODE_FROM_URL",
+  "client_id": "YOUR_CLIENT_ID",
+  "client_secret": "YOUR_CLIENT_SECRET",
+  "redirect_uri": "YOUR_REDIRECT_URI"
+}</code></pre>
+            </div>
+            <div class="border-t border-border p-4 bg-codebg">
+              <p class="text-xs text-text-muted mb-2 font-semibold uppercase tracking-wider">Response</p>
+              <pre class="text-sm text-text-muted font-mono overflow-x-auto"><code>{
+  "access_token": "random_access_string",
+  "id_token": "eyJhbGci...", // JWT containing user identity
+  "token_type": "Bearer",
+  "expires_in": 3600
+}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3.3 -->
+        <div class="space-y-3 mt-8">
+          <h3 class="text-lg font-medium text-white">C. Fetch User Info (Optional)</h3>
+          <p class="text-sm text-text-muted">
+            Use the obtained access token to retrieve user profile information from the userinfo endpoint.
+          </p>
+          <div class="bg-surface border border-border rounded-xl overflow-hidden">
+            <div class="bg-border px-4 py-2 flex items-center gap-2">
+              <span class="text-xs font-bold text-green">GET</span>
+              <span class="text-sm font-mono text-text">/o/userinfo</span>
+            </div>
+            <div class="p-4 bg-codebg">
+              <pre class="text-sm text-text-muted font-mono overflow-x-auto"><code>GET /o/userinfo
+Authorization: Bearer YOUR_ACCESS_TOKEN</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Postman Integration -->
+      <section class="space-y-6">
+        <h2 class="text-2xl font-semibold border-b border-border pb-2 flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-border flex items-center justify-center text-sm text-green">4</span>
+          Testing with Postman
+        </h2>
+        <div class="bg-surface border border-border rounded-xl p-6 space-y-4">
+          <p class="text-text-muted leading-relaxed">
+            You can easily test the OAuth 2.0 flow using Postman's built-in authorization tab:
+          </p>
+          <ul class="list-disc list-inside space-y-2 text-sm text-text-muted">
+            <li>Select <strong>OAuth 2.0</strong> in the Authorization tab.</li>
+            <li>Set Grant Type to <strong>Authorization Code</strong>.</li>
+            <li>Auth URL: <code>http://localhost:8000/o/authorize</code></li>
+            <li>Access Token URL: <code>http://localhost:8000/o/token</code></li>
+            <li>Provide your <strong>Client ID</strong> and <strong>Client Secret</strong>.</li>
+            <li>Click <strong>Get New Access Token</strong> to start the browser flow!</li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+    
+    <footer class="mt-16 pt-8 border-t border-border text-center pb-8">
+      <p class="text-sm text-text-muted">Built with ♥ for a seamless authentication experience.</p>
+    </footer>
+  </main>
+
+</body>
+</html>
