@@ -16,8 +16,13 @@ app.use(express.static(path.resolve("public")));
 
 // Ensure DB connection for serverless endpoints
 app.use(async (req, res, next) => {
-  await connectDB();
-  next();
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    res.status(500).json({ error: "Internal Server Error", message: "Database connection failed" });
+  }
 });
 
 // Basic Routes

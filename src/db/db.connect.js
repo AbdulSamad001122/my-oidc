@@ -15,6 +15,7 @@ const connectDB = async () => {
         isConnected = db.connections[0].readyState === 1;
     } catch (error) {
         console.error("Error connecting to MongoDB:", error);
+        throw error;
     }
 };
 
