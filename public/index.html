@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyOIDC | Identity Built for Scale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#000000',
+            surface: '#09090b',
+            'surface-hover': '#18181b',
+            border: '#27272a',
+            green: '#10b981',
+            'green-dim': '#059669',
+            text: '#f9fafb',
+            'text-muted': '#a1a1aa',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['SFMono-Regular', 'Consolas', 'monospace']
+          },
+          animation: {
+            'float-slow': 'float 8s ease-in-out infinite',
+            'float-fast': 'float 4s ease-in-out infinite',
+            'pulse-glow': 'pulseGlow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'spin-slow': 'spin 15s linear infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-20px)' },
+            },
+            pulseGlow: {
+              '0%, 100%': { opacity: 0.5, transform: 'scale(1)' },
+              '50%': { opacity: 0.8, transform: 'scale(1.05)' },
+            }
+          },
+          boxShadow: {
+            'glow': '0 0 40px -10px rgba(16, 185, 129, 0.15)',
+            'glow-lg': '0 0 80px -15px rgba(16, 185, 129, 0.3)',
+            'glass': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.05)',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-bg text-text font-sans min-h-screen antialiased flex flex-col overflow-x-hidden selection:bg-green selection:text-black">
+  
+  <!-- Navbar -->
+  <nav class="border-b border-white/5 bg-black/50 sticky top-0 z-50 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3 group cursor-pointer">
+        <div class="w-8 h-8 bg-green rounded-lg flex items-center justify-center text-[1rem] shadow-[0_0_15px_rgba(16,185,129,0.4)] group-hover:scale-105 transition-transform duration-300">🔐</div>
+        <span class="font-extrabold text-[1.1rem] tracking-tight text-white group-hover:text-green transition-colors duration-300">MyOIDC</span>
+      </div>
+      <div class="flex items-center gap-8">
+        <a href="/docs.html" class="hidden md:block text-[0.85rem] font-semibold text-text-muted hover:text-white transition-colors">Documentation</a>
+        <a href="/demo.html" class="hidden md:block text-[0.85rem] font-semibold text-text-muted hover:text-white transition-colors">Interactive Demo</a>
+        <a href="/dev-login.html" class="bg-green text-black px-5 py-2 rounded-full font-bold text-[0.85rem] hover:bg-green-dim transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] hover:-translate-y-0.5">Developer Portal</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="relative pt-16 pb-20 lg:pt-24 lg:pb-32 overflow-hidden">
+    <!-- Animated Orbs -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
+      <div class="absolute top-10 left-1/4 w-[500px] h-[500px] bg-green/20 rounded-full blur-[120px] animate-pulse-glow"></div>
+      <div class="absolute bottom-20 right-1/4 w-[400px] h-[400px] bg-emerald-400/10 rounded-full blur-[100px] animate-float-slow"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6 relative z-10 text-center">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-green/30 text-green font-semibold text-[0.8rem] mb-10 shadow-glow backdrop-blur-md animate-float-fast">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-green"></span>
+        </span>
+        Custom Built Authentication Provider
+      </div>
+      
+      <h1 class="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tighter leading-[1.05] mb-8">
+        Your Identity, <br class="hidden sm:block"/>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-green via-emerald-400 to-teal-200">Perfectly Controlled.</span>
+      </h1>
+      
+      <p class="text-xl lg:text-2xl text-text-muted max-w-3xl mx-auto mb-12 leading-relaxed font-medium">
+        Deliver a seamless OpenID Connect login experience. Built entirely on Express & MongoDB, providing pure, standard-compliant authorization without the bloat.
+      </p>
+      
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-5">
+        <a href="/dev-login.html" class="w-full sm:w-auto px-10 py-4 bg-green text-black font-extrabold rounded-xl text-[1.1rem] hover:bg-green-dim transition-all duration-300 shadow-glow-lg hover:shadow-[0_0_50px_rgba(16,185,129,0.6)] flex items-center justify-center gap-3 hover:-translate-y-1">
+          Launch Portal
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+        </a>
+        <a href="/demo.html" class="w-full sm:w-auto px-10 py-4 bg-surface/80 border border-border text-white font-bold rounded-xl text-[1.1rem] hover:bg-surface-hover hover:border-green/50 transition-all duration-300 flex items-center justify-center gap-3 backdrop-blur-md hover:-translate-y-1">
+          Try The Demo
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Features Grid Section -->
+  <section class="py-24 relative border-t border-white/5 bg-surface/30">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold mb-4">Everything You Need. <span class="text-text-muted">Nothing You Don't.</span></h2>
+        <p class="text-text-muted text-lg max-w-2xl mx-auto">Native implementation of real-world OIDC features, powered by a robust backend architecture.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- Feature: Auth Code Flow -->
+        <div class="bg-surface/50 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-glass hover:border-green/50 hover:shadow-glow transition-all duration-500 group">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green/20 to-transparent border border-green/20 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">🌊</div>
+          <h3 class="text-xl font-bold mb-3 text-white">Auth Code Flow</h3>
+          <p class="text-[0.95rem] text-text-muted leading-relaxed">Standard OAuth 2.0 Authorization Code grant. Issue and exchange codes securely for access and ID tokens via your dedicated token endpoint.</p>
+        </div>
+
+        <!-- Feature: MongoDB Store -->
+        <div class="bg-surface/50 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-glass hover:border-green/50 hover:shadow-glow transition-all duration-500 group">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green/20 to-transparent border border-green/20 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">🗄️</div>
+          <h3 class="text-xl font-bold mb-3 text-white">MongoDB Architecture</h3>
+          <p class="text-[0.95rem] text-text-muted leading-relaxed">Built on a solid Mongoose schema. Persistent tracking of Users, Client Applications, and ephemeral Auth Codes for extreme reliability.</p>
+        </div>
+
+        <!-- Feature: RS256 JWT Signing -->
+        <div class="bg-surface/50 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-glass hover:border-green/50 hover:shadow-glow transition-all duration-500 group">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green/20 to-transparent border border-green/20 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">🔑</div>
+          <h3 class="text-xl font-bold mb-3 text-white">RS256 JWT Signing</h3>
+          <p class="text-[0.95rem] text-text-muted leading-relaxed">Secure ID tokens generated with `node-jose` using RSA-SHA256 signatures. Automatically exposed via your `/.well-known/jwks.json` endpoint.</p>
+        </div>
+
+        <!-- Feature: Multi-Account Chooser -->
+        <div class="bg-surface/50 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-glass hover:border-green/50 hover:shadow-glow transition-all duration-500 group">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green/20 to-transparent border border-green/20 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">👥</div>
+          <h3 class="text-xl font-bold mb-3 text-white">Multi-Account Sessions</h3>
+          <p class="text-[0.95rem] text-text-muted leading-relaxed">Like Google, users can maintain multiple active sessions. The built-in account chooser lets them seamlessly switch identities during authorization.</p>
+        </div>
+
+        <!-- Feature: Discovery Document -->
+        <div class="bg-surface/50 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-glass hover:border-green/50 hover:shadow-glow transition-all duration-500 group">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green/20 to-transparent border border-green/20 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">📡</div>
+          <h3 class="text-xl font-bold mb-3 text-white">OIDC Discovery</h3>
+          <p class="text-[0.95rem] text-text-muted leading-relaxed">Plug and play with any library. Your provider implements `.well-known/openid-configuration` so client libraries can autodiscover endpoints.</p>
+        </div>
+
+        <!-- Feature: Developer Portal -->
+        <div class="bg-surface/50 border border-white/5 rounded-3xl p-8 backdrop-blur-xl shadow-glass hover:border-green/50 hover:shadow-glow transition-all duration-500 group">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green/20 to-transparent border border-green/20 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">⚙️</div>
+          <h3 class="text-xl font-bold mb-3 text-white">Developer Portal</h3>
+          <p class="text-[0.95rem] text-text-muted leading-relaxed">A ready-to-use admin dashboard for developers to register applications, manage redirect URIs, and instantly copy their Client IDs and Secrets.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Code Snippet Section -->
+  <section class="py-24 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
+      
+      <div class="flex-1 z-10">
+        <h2 class="text-4xl font-bold mb-6">Drop it into your app in <span class="text-green">seconds.</span></h2>
+        <p class="text-xl text-text-muted mb-8 leading-relaxed">
+          Because it fully implements the OpenID Connect spec, you can use standard libraries across React, Next.js, Go, or Python.
+        </p>
+        <ul class="space-y-4">
+          <li class="flex items-center gap-4 text-text-muted font-medium text-lg"><div class="w-8 h-8 rounded-full bg-green/20 text-green flex items-center justify-center border border-green/30">1</div> Register your app in the Developer Portal</li>
+          <li class="flex items-center gap-4 text-text-muted font-medium text-lg"><div class="w-8 h-8 rounded-full bg-green/20 text-green flex items-center justify-center border border-green/30">2</div> Copy your <code class="bg-surface border border-border px-2 py-0.5 rounded text-green">client_id</code></li>
+          <li class="flex items-center gap-4 text-text-muted font-medium text-lg"><div class="w-8 h-8 rounded-full bg-green/20 text-green flex items-center justify-center border border-green/30">3</div> Redirect users to <code class="bg-surface border border-border px-2 py-0.5 rounded text-green">/o/authorize</code></li>
+        </ul>
+      </div>
+
+      <div class="flex-1 w-full relative z-10">
+        <div class="absolute inset-0 bg-green/10 blur-[100px] rounded-full"></div>
+        <div class="relative bg-[#0d1117] border border-border rounded-2xl shadow-glow-lg overflow-hidden group">
+          <div class="flex items-center gap-2 px-4 py-3 bg-black/40 border-b border-white/5">
+            <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+            <div class="w-3 h-3 rounded-full bg-green/80"></div>
+            <div class="ml-4 text-xs font-mono text-text-muted">app.js</div>
+          </div>
+          <div class="p-6 overflow-x-auto">
+<pre class="font-mono text-sm leading-relaxed text-[#c9d1d9]"><span class="text-[#ff7b72]">const</span> url <span class="text-[#ff7b72]">=</span> <span class="text-[#a5d6ff]">\`\${OIDC_URL}/o/authorize\`</span>;
+<span class="text-[#ff7b72]">const</span> params <span class="text-[#ff7b72]">=</span> <span class="text-[#ff7b72]">new</span> <span class="text-[#d2a8ff]">URLSearchParams</span>({
+  <span class="text-[#79c0ff]">client_id</span>: <span class="text-[#a5d6ff]">'YOUR_CLIENT_ID'</span>,
+  <span class="text-[#79c0ff]">redirect_uri</span>: <span class="text-[#a5d6ff]">'https://app.com/callback'</span>,
+  <span class="text-[#79c0ff]">response_type</span>: <span class="text-[#a5d6ff]">'code'</span>,
+  <span class="text-[#79c0ff]">state</span>: <span class="text-[#a5d6ff]">'random_state_string'</span>
+});
+
+<span class="text-[#8b949e]"><i>// Send user to MyOIDC Login / Account Chooser</i></span>
+<span class="text-[#79c0ff]">window</span>.location.href <span class="text-[#ff7b72]">=</span> <span class="text-[#a5d6ff]">\`\${url}?\${params}\`</span>;
+</pre>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+
+  <!-- Bottom CTA -->
+  <section class="py-24 relative border-t border-white/5">
+    <div class="max-w-4xl mx-auto px-6 text-center z-10 relative">
+      <h2 class="text-5xl font-extrabold mb-8 tracking-tight">Ready to integrate?</h2>
+      <p class="text-xl text-text-muted mb-10">Start managing applications and authenticating users on your own fully-featured provider today.</p>
+      <a href="/dev-login.html" class="inline-flex px-12 py-5 bg-white text-black font-extrabold rounded-xl text-[1.1rem] hover:bg-gray-200 transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:shadow-[0_0_50px_rgba(255,255,255,0.4)] hover:-translate-y-1">
+        Go to Developer Portal
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 py-12 mt-auto z-10 bg-black">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <div class="w-6 h-6 bg-green rounded flex items-center justify-center text-[0.7rem] text-black shadow-[0_0_10px_rgba(16,185,129,0.3)]">🔐</div>
+        <span class="font-bold text-[0.95rem] text-white tracking-tight">MyOIDC</span>
+      </div>
+      <div class="flex flex-wrap justify-center gap-8 text-[0.85rem] text-text-muted font-medium">
+        <a href="/docs.html" class="hover:text-green transition-colors">Documentation</a>
+        <a href="/demo.html" class="hover:text-green transition-colors">Demo</a>
+        <a href="/.well-known/openid-configuration" class="hover:text-green transition-colors" target="_blank">OIDC Config</a>
+        <a href="/.well-known/jwks.json" class="hover:text-green transition-colors" target="_blank">JWKS</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

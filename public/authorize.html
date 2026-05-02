@@ -12,38 +12,48 @@
       theme: {
         extend: {
           colors: {
-            bg: '#0a0f0a',
-            surface: '#111a11',
-            'surface-hover': '#162016',
-            border: '#1f2f1f',
-            green: '#22c55e',
-            'green-dim': '#16a34a',
-            text: '#e8f5e9',
-            'text-muted': '#6b8f6b',
-            error: '#f87171'
+            bg: '#000000',
+            surface: '#09090b',
+            'surface-hover': '#18181b',
+            border: '#27272a',
+            green: '#10b981',
+            'green-dim': '#059669',
+            text: '#f9fafb',
+            'text-muted': '#a1a1aa',
+            error: '#ef4444'
           },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
+            mono: ['SFMono-Regular', 'Consolas', 'monospace']
           },
           animation: {
             toastIn: 'toastIn 0.25s ease',
             spin: 'spin 0.7s linear infinite',
+            pulseGlow: 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
           },
           keyframes: {
             toastIn: {
               '0%': { opacity: 0, transform: 'translateX(20px)' },
               '100%': { opacity: 1, transform: 'translateX(0)' }
+            },
+            pulseGlow: {
+              '0%, 100%': { opacity: 1 },
+              '50%': { opacity: .5 },
             }
+          },
+          boxShadow: {
+            'glow': '0 0 40px -10px rgba(16, 185, 129, 0.15)',
+            'glass': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.05)',
           }
         }
       }
     }
   </script>
 </head>
-<body class="bg-bg text-text font-sans flex justify-center items-center min-h-screen antialiased">
+<body class="bg-bg bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green/10 via-bg to-bg text-text font-sans flex justify-center items-center min-h-screen antialiased">
   <div id="toast-container" class="fixed top-5 right-5 flex flex-col gap-2.5 z-[9999]"></div>
 
-  <div class="bg-surface border border-border rounded-[18px] py-10 px-8 w-full max-w-[400px]">
+  <div class="bg-surface/60 border border-border shadow-glow shadow-glass backdrop-blur-xl rounded-[18px] py-10 px-8 w-full max-w-[400px]">
     <div class="w-11 h-11 bg-green rounded-[10px] flex items-center justify-center mx-auto mb-6 text-xl">🔐</div>
     <h1 id="formTitle" class="text-[1.35rem] font-bold text-center text-text mb-1.5">Sign in to continue</h1>
     <p class="text-center text-[0.875rem] text-text-muted mb-8">An application is requesting access to your account.</p>
@@ -64,7 +74,7 @@
           <label for="password" class="block text-[0.8rem] font-medium text-text-muted mb-1.5 mt-4 uppercase tracking-wider">Password</label>
           <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password" class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors duration-150 focus:outline-none focus:border-green placeholder:text-text-muted">
         </div>
-        <button type="submit" class="w-full py-3 bg-green text-[#0a0f0a] border-none rounded-lg text-[0.925rem] font-bold cursor-pointer transition-all duration-150 hover:bg-green-dim active:scale-98 disabled:opacity-55 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2" id="loginBtn">
+        <button type="submit" class="w-full py-3 bg-green text-black border-none rounded-lg text-[0.925rem] font-bold cursor-pointer transition-all duration-150 hover:bg-green-dim active:scale-98 disabled:opacity-55 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2" id="loginBtn">
           Sign in
         </button>
       </form>
@@ -91,7 +101,7 @@
           <label for="regPassword" class="block text-[0.8rem] font-medium text-text-muted mb-1.5 uppercase tracking-wider">Password</label>
           <input type="password" id="regPassword" placeholder="••••••••" required autocomplete="new-password" class="w-full py-3 px-3.5 border border-border rounded-lg bg-bg text-text text-[0.925rem] transition-colors duration-150 focus:outline-none focus:border-green placeholder:text-text-muted">
         </div>
-        <button type="submit" class="w-full py-3 bg-green text-[#0a0f0a] border-none rounded-lg text-[0.925rem] font-bold cursor-pointer transition-all duration-150 hover:bg-green-dim active:scale-98 disabled:opacity-55 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2" id="signupBtn">
+        <button type="submit" class="w-full py-3 bg-green text-black border-none rounded-lg text-[0.925rem] font-bold cursor-pointer transition-all duration-150 hover:bg-green-dim active:scale-98 disabled:opacity-55 disabled:cursor-not-allowed mt-2 flex items-center justify-center gap-2" id="signupBtn">
           Create account
         </button>
       </form>
@@ -102,7 +112,7 @@
     function showToast(message, type = 'error') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
-      const styleClass = type === 'success' ? 'bg-[#0d2d0d] border-[#166534] text-[#86efac]' : 'bg-[#2d0d0d] border-[#991b1b] text-[#fca5a5]';
+      const styleClass = type === 'success' ? 'bg-surface-hover border-green-dim text-green' : 'bg-[#2d0d0d] border-[#991b1b] text-[#fca5a5]';
       const icon = type === 'success' ? '✓' : '✕';
       toast.className = `flex items-center gap-3 py-[0.85rem] px-[1.1rem] rounded-[12px] text-[0.875rem] font-medium min-w-[240px] max-w-[340px] border animate-toastIn ${styleClass}`;
       toast.innerHTML = `

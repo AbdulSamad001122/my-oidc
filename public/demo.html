@@ -12,14 +12,15 @@
       theme: {
         extend: {
           colors: {
-            bg: '#0a0f0a',
-            surface: '#111a11',
-            'surface-hover': '#162016',
-            border: '#1f2f1f',
-            green: '#22c55e',
-            'green-dim': '#16a34a',
-            text: '#e8f5e9',
-            'text-muted': '#6b8f6b'
+            bg: '#000000',
+            surface: '#09090b',
+            'surface-hover': '#18181b',
+            border: '#27272a',
+            green: '#10b981',
+            'green-dim': '#059669',
+            text: '#f9fafb',
+            'text-muted': '#a1a1aa',
+            error: '#ef4444'
           },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
@@ -28,28 +29,37 @@
           animation: {
             toastIn: 'toastIn 0.25s ease',
             spin: 'spin 0.7s linear infinite',
+            pulseGlow: 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
           },
           keyframes: {
             toastIn: {
               '0%': { opacity: 0, transform: 'translateX(20px)' },
               '100%': { opacity: 1, transform: 'translateX(0)' }
+            },
+            pulseGlow: {
+              '0%, 100%': { opacity: 1 },
+              '50%': { opacity: .5 },
             }
+          },
+          boxShadow: {
+            'glow': '0 0 40px -10px rgba(16, 185, 129, 0.15)',
+            'glass': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.05)',
           }
         }
       }
     }
   </script>
 </head>
-<body class="bg-bg text-text font-sans flex justify-center items-center min-h-screen py-8 px-4 antialiased">
+<body class="bg-bg bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-green/10 via-bg to-bg text-text font-sans flex justify-center items-center min-h-screen py-8 px-4 antialiased">
   <div id="toast-container" class="fixed top-5 right-5 flex flex-col gap-2.5 z-[9999]"></div>
-  <div class="bg-surface border border-border rounded-[18px] py-10 px-8 w-full max-w-[440px]">
+  <div class="bg-surface/60 border border-border shadow-glow shadow-glass backdrop-blur-xl rounded-[18px] py-10 px-8 w-full max-w-[440px]">
     <!-- Guest View -->
     <div id="guestView" class="block">
       <div class="text-5xl text-center mb-5">🚀</div>
       <h1 class="text-2xl font-bold text-center mb-2">MyAwesomeApp</h1>
       <p class="text-[0.9rem] text-text-muted text-center mb-8 leading-relaxed">This is a demo third-party application.<br>Sign in with MyOIDC to see the full authorization flow in action.</p>
-      <button class="w-full py-3.5 bg-green text-[#0a0f0a] border-none rounded-lg text-base font-bold cursor-pointer flex items-center justify-center gap-3 transition-all duration-150 hover:bg-green-dim active:scale-98 disabled:opacity-55 disabled:cursor-not-allowed" id="loginBtn">
-        <div class="w-5 h-5 bg-white rounded flex items-center justify-center text-[0.7rem] font-bold text-[#0a0f0a] shrink-0">ID</div>
+      <button class="w-full py-3.5 bg-green text-black border-none rounded-lg text-base font-bold cursor-pointer flex items-center justify-center gap-3 transition-all duration-150 hover:bg-green-dim active:scale-98 disabled:opacity-55 disabled:cursor-not-allowed" id="loginBtn">
+        <div class="w-5 h-5 bg-white rounded flex items-center justify-center text-[0.7rem] font-bold text-black shrink-0">ID</div>
         Continue with MyOIDC
       </button>
     </div>
@@ -57,7 +67,7 @@
     <!-- Profile View -->
     <div id="profileView" class="hidden">
       <div class="flex items-center gap-5 mb-7 pb-7 border-b border-border">
-        <div class="w-14 h-14 rounded-full bg-green text-[#0a0f0a] flex items-center justify-center font-bold text-2xl shrink-0" id="avatarText">?</div>
+        <div class="w-14 h-14 rounded-full bg-green text-black flex items-center justify-center font-bold text-2xl shrink-0" id="avatarText">?</div>
         <div>
           <div class="text-[1.1rem] font-bold mb-1" id="profileName"></div>
           <div class="text-[0.85rem] text-text-muted" id="profileEmail"></div>
@@ -78,7 +88,7 @@
     function showToast(msg, type='error'){
       const c=document.getElementById('toast-container');
       const t=document.createElement('div');
-      const styleClass = type === 'success' ? 'bg-[#0d2d0d] border-[#166534] text-[#86efac]' : 'bg-[#2d0d0d] border-[#991b1b] text-[#fca5a5]';
+      const styleClass = type === 'success' ? 'bg-surface-hover border-green-dim text-green' : 'bg-[#2d0d0d] border-[#991b1b] text-[#fca5a5]';
       const icon = type === 'success' ? '✓' : '✕';
       t.className=`flex items-center gap-3 py-[0.85rem] px-[1.1rem] rounded-[12px] text-[0.875rem] font-medium min-w-[240px] max-w-[340px] border animate-toastIn ${styleClass}`;
       t.innerHTML=`<span class="text-base shrink-0">${icon}</span><span>${msg}</span><button class="ml-auto bg-transparent border-none text-current cursor-pointer opacity-60 hover:opacity-100 text-base leading-none p-0 w-auto" onclick="this.parentElement.remove()">✕</button>`;
@@ -110,7 +120,7 @@
       }catch{
         showToast('Failed to connect. Is the server running?');
         btn.disabled=false;
-        btn.innerHTML='<div class="w-5 h-5 bg-white rounded flex items-center justify-center text-[0.7rem] font-bold text-[#0a0f0a] shrink-0">ID</div> Continue with MyOIDC';
+        btn.innerHTML='<div class="w-5 h-5 bg-white rounded flex items-center justify-center text-[0.7rem] font-bold text-black shrink-0">ID</div> Continue with MyOIDC';
       }
     });
 
@@ -147,7 +157,7 @@
         const row=document.createElement('div');
         row.className='flex justify-between items-center py-2.5 border-b border-border gap-4 last:border-none';
         const val=k==='email_verified'
-          ?`<span class="text-[0.72rem] py-0.5 px-2 rounded-full bg-[#0d2d0d] border border-[#166534] text-[#86efac]">${v}</span>`
+          ?`<span class="text-[0.72rem] py-0.5 px-2 rounded-full bg-surface-hover border border-green-dim text-green">${v}</span>`
           :`<span class="text-[0.82rem] font-mono text-green text-right break-all">${String(v).length>30?String(v).slice(0,28)+'…':v}</span>`;
         row.innerHTML=`<span class="text-[0.82rem] text-text-muted shrink-0">${k}</span>${val}`;
         cl.appendChild(row);
